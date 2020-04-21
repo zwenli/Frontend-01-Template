@@ -6,6 +6,8 @@
 
 作业提交：每周三 23:59 前提交上周项目作业 & 学习总结
 
+作业提交地址：[https://github.com/GeekUniversity/Frontend-01-Template](https://github.com/GeekUniversity/Frontend-01-Template)
+
 ### 作业提交通用模版
 
 ```md
