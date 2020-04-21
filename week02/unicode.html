@@ -1,0 +1,58 @@
+I learned Java Script today.
+I learned Java&nbsp;Script today.
+<script>
+for (let i = 0; i < 2047; i++) {
+  // console.log(String.fromCharCode(i))
+  document.write("<span>" + i +"</span><span style='background-color: green'>" + String.fromCharCode(i) + "</span><br>")
+}
+
+// var 厉害 = 1
+var \u5389\u5bb3 = 1;//comment
+
+console.log(厉害)
+
+function UTf8_encode(string) {
+  // return Uint8Array
+  const charArr = string.split('')
+  const utf8Arr = charArr.reduce((arr, char) => {
+    arr.push(...char_encode(char))
+    return arr
+  }, [])
+  return new Uint8Array(utf8Arr)
+}
+function char_encode(char) {
+  const codePoint = char.codePointAt(0)
+  if (codePoint <= 127) {
+    // 0x000000-0x00007f (0-127)
+    return [codePoint]
+  } else if (codePoint >= 182 && codePoint <= 2047){
+    // 0x000080-0x0007FF (128-2047) 
+    // 110yyyyy 10zzzzzz
+    const y = (codePoint >> 6) + 192
+    const z = (codePoint & 0b111111) + 128
+    return [y, z]
+  } else if (codePoint >= 2048 && codePoint <= 65535 ) {
+    // 0x000800-00FFFF (2048-65535)
+    // 1110xxxx 10yyyyyy 10zzzzzz
+    const x = (codePoint >> 12) + 224
+    const y = (codePoint >> 6 & 0b111111) + 128
+    const z = (codePoint & 0b111111) + 128
+    return [x, y, z]
+  } else if (codePoint >= 65536 && codePoint <= 1114111) {
+    // 0x010000-0x10FFFF (65536-1114111)
+    // 11110www 10xxxxxx 10yyyyyy 10zzzzzz
+    const w = (codePoint >> 18) + 240
+    const x = (codePoint >> 12 & 0b111111) + 128
+    const y = (codePoint >> 6 & 0b111111) + 128
+    const z = (codePoint & 0b111111) + 128
+    return [w, x, y, z]
+  }
+  return []
+}
+
+// test
+var utf8decoder = new window.TextDecoder()
+var testStr = 'utf-8测试'
+
+utf8decoder.decode(UTf8_encode(testStr)) === testStr
+</script>
