@@ -1,0 +1,96 @@
+<script>
+  function convertStringToNumber(string, radix = 10) {
+    if (radix < 2) {
+      return NaN
+    }
+    // 'a'-97, 'z'-122, 'A'-65, 'Z'-90, '0'-48, '9'-57
+    const chars = string.split('')
+    const length = chars.length
+    let number = 0
+    let i = 0
+    let fraction = 1
+    // 整数
+    while(i < length && chars[i] !== '.') {
+      number = number * radix
+      const codePoint = chars[i].codePointAt(0)
+      if (radix <= 10) {
+        if (codePoint >= 48 && codePoint < (48 + radix)) {
+          number += codePoint - 48
+        } else {
+          return (number ? number : NaN)
+        }
+      } else {
+        if (codePoint >= 48 && codePoint <= 57) {
+          number += codePoint - 48
+        } else if (codePoint >= 65 && codePoint < (65 + radix)) {
+          number += codePoint - 55
+        } else if (codePoint >= 97 && codePoint < (97 + radix)) {
+          number += codePoint - 87
+        } else {
+          return (number ? number : NaN)
+        }
+      }
+      i++
+    }
+    // 非10进制的不做小数点
+    if (radix === 10) {
+      // 小数点
+      if (chars[i] === '.') {
+        i++
+      }
+      // 小数
+      while(i < length) {
+        fraction = fraction / radix
+        const codePoint = chars[i].codePointAt(0)
+        if (codePoint >= 48 && codePoint <= 57) {
+          number += (chars[i].codePointAt(0) - 48) * fraction
+        } else {
+          return (number ? number : NaN)
+        }
+        i++
+      }
+    }
+    return number
+  }
+  
+  function converNumberToString(number, radix = 10) {
+    if (radix < 2) {
+      return new Error('radix argument must be bigger than 1')
+    }
+    if (number === 0) {
+      return '0'
+    }
+    let string = ''
+    // 非10进制不做小数处理
+    if (radix !== 10) {
+      let integer = Math.floor(number)
+      while (integer > 0) {
+        // string = String(integer % radix) + string
+        const remainder = integer % radix
+        if (remainder < 10) {
+          string = String(integer % radix) + string
+        } else {
+          string = String.fromCodePoint(87 + remainder) + string
+        }
+        integer = Math.floor(integer / radix)
+      }
+    } else {
+      let decimalPoint = 0
+      while(Math.floor(number) - number < 0) {
+        decimalPoint++
+        number = number * radix
+      }
+      while (number > 0 && decimalPoint > 0) {
+        string = String(number % radix) + string
+        number = Math.floor(number / radix)
+        decimalPoint--
+      }
+      string = '.' + string
+      while (number > 0) {
+        string = String(number % radix) + string
+        number = Math.floor(number / radix)
+      }
+    }
+    return string
+  }
+</script>

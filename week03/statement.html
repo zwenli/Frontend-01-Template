@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <script>
+    for (let p of [1,2,3]) {
+      console.log(p)
+    }
+    function *g() {
+      yield 0;
+      yield 1;
+      yield 2;
+    }
+    for (let i of g()) {
+      console.log(i)
+    }
+    // LabelledStatement, 所有语句都可以加上label
+    function Cls() {
+    public:
+      this.a = 1
+      this.b = 2
+    private:
+      var x = 3
+      var y = 4
+    }
+    // 等价与
+    function Cls2() {
+      public:this.a = 1
+      this.b = 2
+      private:var x = 3
+      var y = 4
+    }
+    
+    var e = 2
+    try {
+      throw 3
+    } catch(e) {
+      console.log(e)
+    }
+    console.log(e)
+    
+    
+    function sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms))
+    }
+    void async function() {
+      var i = 0;
+      while(true) {
+        console.log(i)
+        await sleep(1000)
+      }
+    }();
+    
+    async function* g() {
+      let i = 0;
+      while(true) {
+        yield i++
+        await sleep(1000)
+      }
+    }
+    void async function(){
+      console.log(await g().next())
+      console.log(await g().next())
+      console.log(await g().next())
+      console.log(await g().next())
+    }();
+  </script>
+</body>
+</html>

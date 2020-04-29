@@ -285,7 +285,11 @@ Unicode
 
 浮点数比较：Math.abs(0.1 + 0.2 - 0.3) < Number.EPSILON
 
+Math.abs(1.3 + 1.1 - 2.4) < Number.EPSILON // false
+
 其实浮点数都是有个最小精度问题，0.1 + 0.2 为什么不等于0.3 就是精度的问题了，换个角度想，两个数字之间的差值在最小精度之内就是可以理解为是相等的了。
+
+大端-小端
 
 ### Number-Grammar
 
