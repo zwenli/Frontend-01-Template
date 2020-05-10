@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Realm Intrinsic Objects</title>
+</head>
+<body>
+  <div id="container" style="width: 100vh; height: 100vh;"></div>
+  <script src="https://gw.alipayobjects.com/os/antv/pkg/_antv.g6-3.3.1/dist/g6.min.js"></script>
+  <script>
+    const set = new Set()
+    const globalProperties = [
+      'eval',
+      'isFinite',
+      'isNaN',
+      'parseFloat',
+      'parseInt',
+      'decodeURI',
+      'decodeURIComponent',
+      'encodeURI',
+      'encodeURIComponent',
+      'Array',
+      'Date',
+      'RegExp',
+      'Promise',
+      'Proxy',
+      'Map',
+      'WeakMap',
+      'Set',
+      'WeakSet',
+      'Function',
+      'Boolean',
+      'String',
+      'Number',
+      'Symbol',
+      'Object',
+      'Error',
+      'EvalError',
+      'RangeError',
+      'ReferenceError',
+      'SyntaxError',
+      'TypeError',
+      'URIError',
+      'ArrayBuffer',
+      'SharedArrayBuffer',
+      'DataView',
+      'Float32Array',
+      'Float64Array',
+      'Int8Array',
+      'Int16Array',
+      'Int32Array',
+      'Uint8Array',
+      'Uint16Array',
+      'Uint32Array',
+      'Uint8ClampedArray',
+      'Atomics',
+      'JSON',
+      'Math',
+      'Reflect',
+    ]
+    
+    /**
+     * 获取全局对象的固有对象
+     */
+    function getIntrinsicObjectsData() {
+      let data = {
+        id: 'Realm',
+        label: 'Realm',
+        object: this,
+        children: [],
+        path: [],
+      }
+      for(let p of globalProperties) {
+        let item = {}
+        if (typeof this[p] === 'function') {
+          item = {
+            id: p + ':' + this[p].name,
+            label: this[p].name,
+            object: this[p],
+            path: [p],
+          }
+        } else {
+          item = {
+            id: p + ':' + p,
+            label: p,
+            object: this[p],
+            path: [p],
+          }
+        }
+        item = getPropertyData(item)
+        data.children.push(item)
+      }
+      return data
+    }
+    /**
+     * helper function 递归遍历属性
+     * @param {Object} current
+     * @param {string} current.id
+     * @param {string} current.label
+     * @param {Object | Function} current.object
+     * @param {Array<string>} current.path
+     * @param {Array} current.children
+     */
+    function getPropertyData(current) {
+      if (set.has(current.object)) {
+        return current
+      }
+      set.add(current.object)
+      current.children = []
+      // console.log(current.path.join('.'))
+      for (let p of Object.getOwnPropertyNames(current.object)) {
+        const descriptor = Object.getOwnPropertyDescriptor(current.object, p)
+        if ( descriptor.hasOwnProperty('value')
+          && ((descriptor.value != null && typeof descriptor.value === 'object') || typeof descriptor.value === 'function')
+          && descriptor.value instanceof Object
+        ) {
+          let data = {
+            path: current.path.concat([p]),
+            object: descriptor.value,
+          }
+          data.id = data.path.join('.') + ':' + p
+          data.label = p
+          data = getPropertyData(data)
+          current.children.push(data)
+        }
+        if (descriptor.hasOwnProperty('get') && typeof descriptor.get === 'function') {
+          let data = {
+            path: current.path.concat([p]),
+            object: descriptor.get,
+          }
+          const label = descriptor.get.name ? descriptor.get.name : 'get ' + p
+          data.id = data.path.join('.') + ':' + label
+          data.label = label
+          data = getPropertyData(data)
+          current.children.push(data)
+        }
+        if (descriptor.hasOwnProperty('set') && typeof descriptor.set === 'function') {
+          let data = {
+            path: current.path.concat([p]),
+            object: descriptor.set,
+          }
+          const label = descriptor.set.name ? descriptor.set.name : 'set ' + p
+          data.id = data.path.join('.') + ':' + label
+          data.label = label
+          data = getPropertyData(data)
+          current.children.push(data)
+        }
+      }
+      return current
+    }
+    
+    const data = getIntrinsicObjectsData()
+    const width = document.getElementById('container').scrollWidth;
+    const height = document.getElementById('container').scrollHeight || 500;
+    const graph = new G6.TreeGraph({
+      container: 'container',
+      width,
+      height,
+      modes: {
+        default: [
+          {
+            type: 'collapse-expand',
+            onChange: function onChange(item, collapsed) {
+              const data = item.get('model').data;
+              data.collapsed = collapsed;
+              return true;
+            },
+          },
+          'drag-canvas',
+          'zoom-canvas',
+        ],
+      },
+      defaultNode: {
+        size: 26,
+        anchorPoints: [
+          [0, 0.5],
+          [1, 0.5],
+        ],
+        style: {
+          fill: '#C6E5FF',
+          stroke: '#5B8FF9',
+        },
+      },
+      defaultEdge: {
+        type: 'cubic-horizontal',
+        style: {
+          stroke: '#A3B1BF',
+        },
+      },
+      layout: {
+        type: 'mindmap',
+        direction: 'H',
+        getHeight: () => {
+          return 16;
+        },
+        getWidth: () => {
+          return 16;
+        },
+        getVGap: () => {
+          return 10;
+        },
+        getHGap: () => {
+          return 100;
+        },
+        getSide: () => {
+          return 'right';
+        },
+      },
+    });
+
+    let centerX = 0;
+    graph.node(function(node) {
+      if (node.id === 'Realm') {
+        centerX = node.x;
+      }
+
+      return {
+        label: node.label,
+        labelCfg: {
+          position:
+            node.children && node.children.length > 0
+              ? 'right'
+              : node.x > centerX
+              ? 'right'
+              : 'left',
+          offset: 5,
+        },
+      };
+    });
+
+    graph.data(data);
+    graph.render();
+    graph.fitView();
+  </script>
+</body>
+</html>

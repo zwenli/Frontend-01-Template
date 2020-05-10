@@ -18,6 +18,14 @@
 #作业&总结链接：https://github.com/zwenli/Frontend-01-Template/tree/master/week01
 ```
 
+```md
+#学号:G20200447010808
+#姓名:张文理
+#班级:3班
+#小组:10组
+#作业&总结链接:https://github.com/zwenli/Frontend-01-Template/tree/master/week01
+```
+
 整体学习安排
 ![整体学习安排](./整体学习安排.png)
 
