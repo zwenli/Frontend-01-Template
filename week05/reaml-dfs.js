@@ -102,9 +102,6 @@
       return current
     }
     set.add(current.object)
-    if (current.label === 'Function') {
-      debugger
-    }
     current.children = []
     console.log(current.path.join('.'))
     for (let p of Object.getOwnPropertyNames(current.object)) {

@@ -129,7 +129,8 @@ Environment Record 类型：
   * Function Environment Records
   * module Environment Records
 * Globaal Environment Recordss
-* Object Enviroment Records
+* Object Enviroment Records: with语句生成的
+  * Object Environment Records created for with statements (13.11) can provide their binding object as an implicit this value for use in function calls.
 
 不同的行为产生不同的records，当enviroment创建时存在上一级的LexicalEnvironment，outer会指向它。
 
