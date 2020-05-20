@@ -39,7 +39,7 @@ npm install css
 
 * 挑战题：我们如何用状态机处理完全未知的 pattern（选做）
 
-  > TODO
+  > [kmp-dfa](./kmp-dfa.js)
 
 * 跟上课堂内容，完成 DOM 树构建
 
