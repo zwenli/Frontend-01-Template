@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>margin collapse</title>
+</head>
+<body>
+  <div style="background-color: lightgreen;">
+    <div style="width: 100px; height: 100px; background-color: aqua; margin: 20px;"></div>
+    <!-- 其实除了overflow: visible，其他的block都会产生一个新的BFC -->
+    <div style="overflow: visible">
+      <div style="width: 100px; height: 100px; background-color: aqua; margin: 20px;"></div>
+      <div style="width: 100px; height: 100px; background-color: aqua; margin: 20px;"></div>
+    </div>
+    <!-- 产生一个新的BFC -->
+    <div style="overflow: hidden;">
+      <div style="width: 100px; height: 100px; background-color: aqua; margin: 20px;">overflow: hidden;</div>
+      <div style="width: 100px; height: 100px; background-color: aqua; margin: 20px;">overflow: hidden;</div>
+    </div>
+    <div style="width: 100px; height: 100px; background-color: aqua; margin: 20px;"></div>
+    <div style="width: 100px; height: 100px; background-color: aqua; margin: 20px;"></div>
+    <!-- inline-block 产生一个新的BFC -->
+    <div style="display: inline-block; width: 100px; height: 100px; background-color: aqua; margin: 20px;">inline-block;</div>
+    <div style="width: 100px; height: 100px; background-color: aqua; margin: 20px;"></div>
+    <div style="width: 100px; height: 100px; background-color: aqua; margin: 20px;"></div>
+  </div>
+</body>
+</html>

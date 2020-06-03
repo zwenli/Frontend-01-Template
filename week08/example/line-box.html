@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>行模型</title>
+</head>
+<body>
+  <div style="font-size: 50px;line-height: 100px; background-color: pink;">
+    <div style="vertical-align: baseline; overflow: visible; display: inline-block; width: 1px; height: 1px;">
+      <div style="height: 1px; width: 100vw; background-color: red;"></div>
+    </div>
+    Hello
+    <!-- <div style="vertical-align: baseline;display: inline-block; line-height: 70px; width: 100px; height: 100px; background-color: aqua;">world</div> -->
+    <!-- <div style="vertical-align: baseline;display: inline-block; line-height: 70px; width: 100px; height: 100px; background-color: aqua;"> -->
+      <!-- inline-box内没有文字，baseline会设置在底部 -->
+    <!-- </div> -->
+    <!-- 建议vertical-align仅使用top，middle，bottom -->
+    <!-- 实际的行高必定越撑越高，满足展示所有 -->
+    <!-- <div style="vertical-align: bottom;display: inline-block; line-height:70px; width: 100px; height: 150px; background-color: aqua;"></div>
+    <div style="vertical-align: middle;display: inline-block; line-height:70px; width: 100px; height: 550px; background-color: plum;"></div>
+    <div style="vertical-align: top;display: inline-block; line-height:70px; width: 100px; height: 50px; background-color: aqua;"></div> -->
+    
+    <!-- 关于text-bottom，text-top -->
+    <!-- text-bottom 是自己的底部对齐行的text-bottom，text-top同理 -->
+    <div style="vertical-align: text-bottom;display: inline-block; line-height:70px; width: 100px; height: 150px; background-color: aqua;">1</div>
+    <div style="vertical-align: text-top;display: inline-block; line-height:70px; width: 100px; height: 550px; background-color: plum;">1</div>
+    <div style="vertical-align: top;display: inline-block; line-height:70px; width: 100px; height: 50px; background-color: aqua;">1</div>
+  </div>
+</body>
+</html>

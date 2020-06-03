@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <!-- inline-block会有空白间隙，原因是有空白字符，产生文本节点，可以在容器加上font-size: 0px;解决这个问题 -->
+  <!-- <div style="display: inline-block; width: 100px; height: 100px; background-color: blue;">1</div>
+  <div style="display: inline-block; width: 100px; height: 100px; background-color: blue;">2</div>
+  <div style="display: inline-block; width: 100px; height: 100px; background-color: blue;">3</div>
+  <div style="display: inline-block; width: 100px; height: 100px; background-color: blue;">4</div>
+  <div style="display: inline-block; width: 100px; height: 100px; background-color: blue;">5</div>
+  <div style="display: inline-block; width: 100px; height: 100px; background-color: blue;">6</div> -->
+  <div style="margin: 10px; float: left; width: 100px; height: 100px; background-color: blue;">1</div>
+  <div style="margin: 10px; float: left; width: 100px; height: 100px; background-color: blue;">2</div>
+  <div style="margin: 10px; clear: left; float: left; width: 100px; height: 100px; background-color: blue;">3</div>
+  <div style="margin: 10px; float: left; width: 100px; height: 100px; background-color: blue;">4</div>
+  <div style="margin: 10px; float: left; width: 100px; height: 100px; background-color: blue;">5</div>
+  <div style="margin: 10px; float: left; width: 100px; height: 100px; background-color: blue;">6</div>
+</body>
+</html>
