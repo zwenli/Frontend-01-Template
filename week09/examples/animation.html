@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    @keyframes mykf {
+      from {
+        background-color: red;
+      }
+      to {
+        background-color: yellow;
+      }
+    }
+    .cls1 {
+      animation: mykf 5s infinite alternate;
+    }
+    @keyframes mykf2 {
+      0% { top: 0; transition: top ease; }
+      50% { top: 150px; transition: top ease-in;}
+      75% { top: 50px; transition: top ease-out;}
+      100% { top: 0; transition: top linear;}
+    }
+    .cls2 {
+      position: relative;
+      animation: mykf2 5s infinite;
+    }
+  </style>
+</head>
+<body>
+  <div class="cls1" style="width: 100px; height: 100px;"></div>
+  <div class="cls2" style="width: 100px; height: 100px; background-color: aqua;"></div>
+</body>
+</html>
