@@ -1,0 +1,217 @@
+<style>
+  .cell {
+    display: inline-block;
+    background-color: green;
+    height: 100px;
+    width: 100px;
+    vertical-align: middle;
+    border: 1px solid white;
+    cursor: pointer;
+  
+    font-size: 50px;
+    line-height: 100px;
+    text-align: center;
+  }
+</style>
+<div id="board"></div>
+<script>
+  // 0 空；1 ⭕️；2 ❌
+  const map = ['', '⭕️', '❌']
+  const pattern = [
+    0, 0, 0,
+    0, 0, 0,
+    0, 0, 0,
+  ]
+  let color = 1
+  
+  function show(pattern) {
+    const board = document.getElementById('board')
+    board.innerHTML = ''
+    for (let i = 0; i < 3; i++) { // y
+      for (let j = 0; j < 3; j++) { // x
+        const cell = document.createElement('span');
+        cell.setAttribute('class', 'cell');
+        // cell.innerText = pattern[i][j] === 2 ? '❌' : 
+        //   pattern[i][j] === 1 ? '⭕️' :
+        //   ''
+        cell.innerText = map[pattern[i * 3 + j]]
+        cell.addEventListener('click', () => userMove(pattern, j, i))
+        board.appendChild(cell)
+      }
+      const br = document.createElement('br');
+      board.appendChild(br)
+    }
+  }
+  
+  function userMove(pattern, x, y) {
+    if (pattern[y * 3 + x] !== 0 ) {
+      return
+    }
+    pattern[y * 3 + x] = color
+    show(pattern)
+    if (check(pattern, pattern[y][x])) {
+      setTimeout(() => {
+        alert(`${map[pattern[y][x]]} is winner!`)
+      }, 0)
+    }
+    color = 3 - color
+    // if (willWin(pattern, color)) {
+    //   console.log(`${map[color]} will win`)
+    // }
+    computerMove()
+  }
+  
+  function computerMove() {
+    let choice = bestChoice(pattern, color)
+    if (choice.point) {
+      pattern[choice.point[1] * 3 + choice.point[0]] = color
+    }
+    show(pattern)
+    if (check(pattern, pattern[choice.point[1] * 3 + choice.point[0]])) {
+      setTimeout(() => {
+        alert(`${map[pattern[choice.point[1] * 3 + choice.point[0]]]} is winner!`)
+      }, 0)
+    }
+    color = 3 - color
+  }
+
+  function check(pattern, color) {
+    for (let i = 0; i < 3; i++) {
+      let win = true
+      for (let j = 0; j < 3; j ++) {
+        if (pattern[i * 3 + j] !== color) {
+          win = false
+          break
+        }
+      }
+      if (win) {
+        return true
+      }
+    }
+    
+    for (let i = 0; i < 3; i++) {
+      let win = true;
+      for (let j = 0; j < 3; j ++) {
+        if (pattern[j * 3 + i] !== color) {
+          win = false
+          break
+        }
+      }
+      if (win) {
+        return true
+      }
+    }
+    
+    {
+      let win = true
+      for (let i = 0; i < 3; i++) {
+        if (pattern[i * 3 + i] !== color) {
+          win = false
+        }
+      }
+      if (win) {
+        return true
+      }
+    }
+    
+    {
+      let win = true
+      for (let i = 0; i < 3; i++) {
+        if (pattern[i * 3 + 2 - i] !== color) {
+          win = false
+          break
+        }
+      }
+      if (win) {
+        return true
+      }
+    }
+    
+    return false
+  }
+  
+  function clone(obj) {
+    return JSON.parse(JSON.stringify(obj))
+  }
+  
+  function willWin(pattern, color) {
+    for (let i = 0; i < 3; i++) {
+      for (let j = 0; j < 3; j++) {
+        if (pattern[i * 3 + j] !== 0) {
+          continue;
+        }
+        let temp = clone(pattern)
+        temp[i * 3 + j] = color
+        if (check(temp, color)) {
+          return [j, i]
+        }
+      }
+    }
+    return null
+  }
+  
+  // 棋局
+  const openings = new Map()
+  
+  openings.set([
+    0,0,0,
+    0,0,0,
+    0,0,0,
+  ].toString() + '1', {
+    point: [1,1],
+    result: 0,
+  })
+  
+  openings.set([
+    0,0,0,
+    0,1,0,
+    0,0,0,
+  ].toString() + '2', {
+    point: [0,0],
+    result: 0,
+  })
+  
+  // win-lose剪枝
+  function bestChoice(pattern, color) {
+    if (openings.has(pattern.toString() + color)) {
+      return openings.get(pattern.toString() + color)
+    }
+    
+    let point = willWin(pattern, color)
+    if (point) {
+      return {
+        point,
+        result: 1,
+      }
+    }
+    
+    // 假定自己处于最坏的情况
+    let result = -1
+    outer: for (let i = 0; i < 3; i++) {
+      inner: for (let j = 0; j < 3; j++) {
+        if (pattern[i * 3 + j] !== 0) {
+          continue
+        }
+        let temp = clone(pattern)
+        temp[i * 3 + j] = color
+        let opp = bestChoice(temp, 3 - color)
+        // 找对手的最佳落棋，对手的结果和我们是相反的
+        if ( -opp.result >= result) {
+          // 换句话说，对手最坏的结果就是我们最好的结果
+          point = [j, i]
+          result = -opp.result
+        }
+        if (result === 1) {
+          break outer
+        }
+      }
+    }
+    
+    return {
+      point,
+      result: point ? result : 0
+    }
+  }
+  
+  show(pattern);
+</script>

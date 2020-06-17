@@ -1,0 +1,32 @@
+<!-- <div id="a">123456789</div>
+<script>
+  const element = document.getElementById('a').childNodes[0]
+  let range = new Range()
+  // 对于文本节点，offset指起始节点算起字符的偏移量
+  range.setStart(element, 3)
+  range.setEnd(element, 6)
+  range.extractContents()
+</script> -->
+<style>
+  span {
+    background-color: lightgreen;
+  }
+  div {
+    background-color: aqua;
+  }
+</style>
+<div id="a">123<span style="background-color: pink;">456789</span>0123456789</div>
+
+<script>
+  const element = document.getElementById('a')
+  let range = new Range()
+  // 定位在span标签内，仍会保留span标签
+  // range.setStart(element.childNodes[1].childNodes[0], 0)
+  // range.setEnd(element.childNodes[2], 5)
+  // let fragment = range.extractContents()
+  // element.appendChild(fragment)
+
+  range.setStart(element.childNodes[0], 3)
+  range.setEnd(element.childNodes[2], 0)
+  let fragment = range.extractContents()
+</script>

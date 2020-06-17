@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <div id="a">
+    <span>1</span>
+    <p>2</p>
+    <p>3</p>
+    <span>4</span>
+  </div>
+  <!-- <script>
+    // 0等级
+    let element = document.getElementById('a')
+    
+    function reverseChildren(element) {
+      // NodeList是living的，需要特殊存个数组
+      const children = Array.prototype.slice.call(element.childNodes)
+      // 不好的地方，遍历两次，还会多次触发reflow
+      for (let child of children) {
+        element.removeChild(child)
+      }
+      children.reverse()
+      for (let child of children) {
+        element.appendChild(child)
+      }
+    }
+    reverseChildren(element)
+  </script> -->
+  <!-- <script>
+    // 1
+    let element = document.getElementById('a')
+    function reverseChildren(element) {
+      let l = element.childNodes.length
+      while (l-- > 0) {
+        element.appendChild(element.childNodes[l])
+      }
+    }
+    reverseChildren(element)
+  </script> -->
+  <!-- <script>
+    // 1.5
+    let element = document.getElementById('a')
+    function reverseChildren(element) {
+      const fragment = new DocumentFragment()
+      let length = element.childNodes.length
+      while (length-- > 0) {
+        fragment.appendChild(element.childNodes[length])
+      }
+      element.appendChild(fragment)
+    }
+    reverseChildren(element)
+  </script> -->
+  <script>
+    // 2
+    let element = document.getElementById('a')
+    
+    function reverseChildren(element) {
+      let range = new Range()
+      range.selectNodeContents(element)
+      // 第一次对真实dom操作，触发reflow
+      let fragment = range.extractContents()
+      var l = fragment.childNodes.length
+      while(l-- > 0) {
+        fragment.appendChild(fragment.childNodes[l])
+      }
+      element.appendChild(fragment)
+    }
+    // 第二次对真实dom操作，触发reflow
+    reverseChildren(element)
+  </script>
+</body>
+</html>

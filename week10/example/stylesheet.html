@@ -1,0 +1,22 @@
+<style title="Hello">
+a {
+  color: red;
+}
+a::before {
+  color: greenyellow;
+  content: 'Hello';
+}
+</style>
+<link rel="stylesheet" title="x" href="data:text,p%7Bcolor:blue%7D">
+<div>
+  <a> world</a>
+</div>
+<script>
+  const style = document.styleSheets[0].cssRules[1].style
+  style.color = 'blue'
+  style.fontSize = '50px'
+  
+  // let range = new Range()
+  // range.selectNodeContents(document.getElementsByTagName('style')[0])
+  // range.extractContents()
+</script>
