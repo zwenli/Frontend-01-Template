@@ -1,0 +1,59 @@
+<style>
+  div {
+    display: inline-block;
+    margin: 25px;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background-color: grey;
+  }
+  .light.red {
+    background-color: red;
+  }
+  .light.green {
+    background-color: green;
+  }
+  .light.yellow {
+    background-color: yellow;
+  }
+</style>
+
+<div class="green"></div>
+<div class="yellow"></div>
+<div class="red"></div>
+
+<script>
+  function red() {
+    const lights = document.getElementsByTagName('div')
+    Array.from(lights).forEach(light => light.classList.remove('light'))
+    document.querySelector('.red').classList.add('light')
+  }
+  function yellow() {
+    const lights = document.getElementsByTagName('div')
+    Array.from(lights).forEach(light => light.classList.remove('light'))
+    document.querySelector('.yellow').classList.add('light')
+  }
+  function green() {
+    const lights = document.getElementsByTagName('div')
+    Array.from(lights).forEach(light => light.classList.remove('light'))
+    document.querySelector('.green').classList.add('light')
+  }
+
+  function sleep(time) {
+    return new Promise((resolve, reject) => {
+      setTimeout(resolve, time)
+    })
+  }
+  
+  async function go() {
+    while(true) {
+      green()
+      await sleep(1000)
+      yellow()
+      await sleep(200)
+      red()
+      await sleep(300)
+    }
+  }
+
+</script>

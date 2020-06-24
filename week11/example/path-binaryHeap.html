@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<style>
+  .cell {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    background-color: gray;
+    border-bottom:solid 1px white;
+    border-right:solid 1px white;
+    vertical-align: middle;
+  }
+  .cell.black {
+    background: black;
+  }
+  #container {
+    width: 701px;
+    font-size: 0;
+    line-height: 0;
+  }
+</style>
+
+<div id="container"></div>
+<button onclick="localStorage.map = JSON.stringify(map)">保存</button>
+
+<script>
+  
+  
+  class Sorted {
+    
+    /**
+     * compareFunction的逻辑
+     * a前, b后
+     * -1: （a < b）,会把a排在小于b索引的位置，即a排在b前面
+     * 0: （a = b），a和b皆不会改变彼此位置，但會與其他全部的元素比較來排序。
+     * 1: （a> b），会把b排在小于a索引的位置，即b排在a前面
+     * 
+     */
+    constructor(data, compare) {
+      this.data = data
+      this.compare = compare
+    }
+    take() {
+      if (!this.data.length) {
+        return
+      }
+      let min = this.data[0]
+      let minIndex = 0
+      for (let i = 1; i < this.data.length; i ++) {
+        if (this.compare(this.data[i], min) < 0) {
+          min = this.data[i]
+          minIndex = i
+        }
+      }
+      // 数组本身是无序的，将最后一个替换最小的那个就好了
+      this.data[minIndex] = this.data[this.data.length - 1]
+      this.data.pop()
+      return min
+    }
+    insert(v) {
+      this.data.push(v)
+    }
+    get length() {
+      return this.data.length
+    }
+  }
+  
+  /**
+   * 二叉堆 BinaryHeap ，头为大（父节点比自节点大）的称为大顶堆，头为小（父节点比子节点小）的为小顶堆
+   * 用数组表示二叉树，[0]为顶，父节点在index/2的位置
+   */
+  
+  class BinaryHeap {
+    constructor(data, compare) {
+      this.data = data
+      this.compare = compare
+    }
+    take() {
+      if (!this.data.length) {
+        return
+      }
+      let min = this.data[0]
+      let i = 0
+      
+      // fix head, 修补空洞
+      while(i < this.data.length) {
+        // 子节点的索引不能大于数组长度
+        if (i * 2 + 1 >= this.data.length) {
+          break
+        }
+        // 只有一个子节点，直接补上空洞
+        if (i * 2 + 2 >= this.data.length) {
+          this.data[i] = this.data[i * 2 + 1]
+          i = i * 2 + 1
+          break
+        }
+        
+        // i的两个子节点 i*2+1 ； i*2+2
+        // 比较两个子节点，将小的补上空洞
+        if (this.compare(this.data[i * 2 + 1], this.data[i * 2 + 2]) < 0) {
+          this.data[i] = this.data[i * 2 + 1]
+          i = i * 2 + 1
+        } else {
+          this.data[i] = this.data[i * 2 + 2]
+          i = i * 2 + 2
+        }
+      }
+      // 将数组的最后一个节点补上空点
+      this.insertAt(i, this.data.pop())
+      
+      return min
+    }
+    insertAt(i, v) {
+      this.data[i] = v
+      // 如果插入的值小于父节点的值，需要交换位置
+      while(i > 0 && this.compare(v, this.data[Math.floor((i - 1)/2)]) < 0) {
+        this.data[i] = this.data[Math.floor((i - 1)/2)]
+        this.data[Math.floor((i - 1)/2)] = v
+        i = Math.floor((i - 1)/2)
+      }
+    }
+    insert(v) {
+      // this.data.push(v)
+      this.insertAt(this.data.length, v)
+    }
+    get length() {
+      return this.data.length
+    }
+  }
+  
+  
+  // const map = Array(10001).join(0).split('').map(s => Number(s))
+  const history = []
+  const map = localStorage.map ? JSON.parse(localStorage.map) : Array(10000).fill(0)
+  const container = document.getElementById('container')
+  const fragment = new DocumentFragment()
+  for (let y = 0; y < 100; y++) {
+    for (let x = 0; x < 100; x++) {
+      let cell = document.createElement('div')
+      cell.classList.add('cell')
+      if (map[y * 100 + x]) {
+        cell.classList.add('black')
+      }
+      
+      cell.addEventListener('mouseover', () => {
+        if (mouse) {
+          if (clear) {
+            cell.classList.remove('black')
+            map[y * 100 + x] = 0
+          } else {
+            cell.classList.add('black')
+            map[y * 100 + x] = 1
+          }
+        }
+      })
+      fragment.appendChild(cell)
+    }
+  }
+  container.appendChild(fragment)
+  
+  let mouse = false // 鼠标是否按下
+  let clear = false // 橡皮擦
+  
+  document.addEventListener('mousedown', (e) => {
+    mouse = true
+    clear = (e.which === 3)
+  })
+  document.addEventListener('mouseup', () => mouse = false)
+  document.addEventListener('contextmenu', e => e.preventDefault()) // 禁用右键事件
+  
+  function sleep(t) {
+    return new Promise((resolve, reject) => setTimeout(resolve, t))
+  }
+  
+  
+  // 寻路函数, 贪心算法？
+  async function path(map, start, end) {
+    function distance([x,y]) {
+      // 正确应该开根号
+      return (x - end[0]) ** 2 + (y - end[1]) ** 2
+    }
+    
+    map = map.slice()
+    container.children[end[1] * 100 + end[0]].style.backgroundColor = 'red'
+    let colletion = new BinaryHeap([start], (a, b) => distance(a) - distance(b)) // 比较距离，取最小的
+    
+    // 状态：走到紫，已走到向四周走蓝，四周已走完绿
+    
+    // 需要判断是否能走
+    async function insert([x, y], pre) {
+      if (map[y* 100+ x] !== 0) {
+        return
+      }
+      if (x < 0 || x >= 100 || y < 0 || y >= 100) {
+        return
+      }
+      // 斜线穿墙逻辑处理
+      if (Math.abs(x-pre[0]) + Math.abs(y-pre[1]) >= 2) {
+        if (
+          map[pre[1] * 100 + x] === 1 &&
+          map[y * 100 + pre[0]] === 1
+        ) {
+          return
+        }
+      }
+      map[100 * y + x] = pre
+      container.children[100 * y + x].style.backgroundColor="lightgreen"
+      await sleep(5)
+      colletion.insert([x, y])
+    }
+    
+    while(colletion.length) {
+      // 每次找离终点最近的点
+      let [x,y] = colletion.take()
+      // console.log(x,y)
+      if (x === end[0] && y === end[1]) {
+        // return true
+        let path = []
+        while(x !== start[0] || y !== start[1]) {
+          colletion.insert([x, y])
+          container.children[y * 100 + x].style.backgroundColor = 'pink'
+          await sleep(1)
+          const pos = map[y * 100 + x]
+          x = pos[0]
+          y = pos[1]
+        }
+        return path
+      }
+      // 当前点走上下左右
+      await insert([x - 1, y], [x, y])
+      await insert([x + 1, y], [x, y])
+      await insert([x, y - 1], [x, y])
+      await insert([x, y + 1], [x, y])
+      
+      await insert([x - 1, y - 1], [x, y])
+      await insert([x + 1, y - 1], [x, y])
+      await insert([x - 1, y + 1], [x, y])
+      await insert([x + 1, y + 1], [x, y])
+    }
+    // return false
+    return null
+  }
+</script>
