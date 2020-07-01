@@ -1,0 +1,39 @@
+<script>
+  const regexp = /([0-9\.]+)|([ ]+)|([\r\n]+)|(\+)|(\-)|(\*)|(\/)/g
+  const dictionary = ['Number', 'whitespace', 'LineTerminator', '+', '-', '*', '/']
+  
+  function* tokenize(source) {
+    let result = null
+    let lastIndex = 0
+    
+    do {
+      lastIndex = regexp.lastIndex
+      result = regexp.exec(source)
+      if (!result) break
+      if (regexp.lastIndex - lastIndex > result[0].length) {
+        // 有非法字符，报错
+        throw new Error('Unexpected token "' + source.slice(lastIndex, regexp.lastIndex - result[0].length) + '"')
+      }
+      // console.log(regexp.lastIndex)
+      // console.log(result[0])
+      let token = {
+        type: null,
+        value: null,
+      }
+      for(let i = 0; i < dictionary.length; i++) {
+        if (result[i + 1]) {
+          // console.log(dictionary[i])
+          token.type = dictionary[i]
+        }
+      }
+      token.value = result[0]
+      yield token
+    } while(result)
+  }
+  for (let token of tokenize('~1000 * 2 + 10 - 3')) {
+    console.log(token)
+  }
+  
+  // 可选作业，用状态机实现
+  
+</script>

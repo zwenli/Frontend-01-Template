@@ -180,14 +180,16 @@
     }
     
     map = map.slice()
+    const table = new Array(100).fill(Infinity) // 保存距离
+    table[start[1] * 100 + start[0]] = 0 // 起始的距离为0
     container.children[end[1] * 100 + end[0]].style.backgroundColor = 'red'
     let colletion = new BinaryHeap([start], (a, b) => distance(a) - distance(b)) // 比较距离，取最小的
     
     // 状态：走到紫，已走到向四周走蓝，四周已走完绿
     
     // 需要判断是否能走
-    async function insert([x, y], pre) {
-      if (map[y* 100+ x] !== 0) {
+    async function insert([x, y], pre, fromStart) {
+      if (map[y* 100+ x] === 1) {
         return
       }
       if (x < 0 || x >= 100 || y < 0 || y >= 100) {
@@ -202,7 +204,12 @@
           return
         }
       }
+      // 距离大于上一个，不插入
+      if(fromStart > table[100 * y + x]) {
+        return
+      }
       map[100 * y + x] = pre
+      table[100 * y + x] = fromStart
       container.children[100 * y + x].style.backgroundColor="lightgreen"
       await sleep(5)
       colletion.insert([x, y])
@@ -211,6 +218,7 @@
     while(colletion.length) {
       // 每次找离终点最近的点
       let [x,y] = colletion.take()
+      const fromStart = table[100 * y + x]
       // console.log(x,y)
       if (x === end[0] && y === end[1]) {
         // return true
@@ -226,15 +234,15 @@
         return path
       }
       // 当前点走上下左右
-      await insert([x - 1, y], [x, y])
-      await insert([x + 1, y], [x, y])
-      await insert([x, y - 1], [x, y])
-      await insert([x, y + 1], [x, y])
+      await insert([x - 1, y], [x, y], fromStart + 1)
+      await insert([x + 1, y], [x, y], fromStart + 1)
+      await insert([x, y - 1], [x, y], fromStart + 1)
+      await insert([x, y + 1], [x, y], fromStart + 1)
       
-      await insert([x - 1, y - 1], [x, y])
-      await insert([x + 1, y - 1], [x, y])
-      await insert([x - 1, y + 1], [x, y])
-      await insert([x + 1, y + 1], [x, y])
+      await insert([x - 1, y - 1], [x, y], fromStart + 1.4)
+      await insert([x + 1, y - 1], [x, y], fromStart + 1.4)
+      await insert([x - 1, y + 1], [x, y], fromStart + 1.4)
+      await insert([x + 1, y + 1], [x, y], fromStart + 1.4)
     }
     // return false
     return null

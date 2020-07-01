@@ -8,6 +8,10 @@
 
 作业提交地址：[https://github.com/GeekUniversity/Frontend-01-Template](https://github.com/GeekUniversity/Frontend-01-Template)
 
+### 课件
+
+链接: https://pan.baidu.com/s/1ET3y5eexynf6xJKpNwHMRw 密码:nepb
+
 ### 作业提交通用模版
 
 ```md

@@ -1,0 +1,152 @@
+<script>
+  const regexp = /([0-9\.]+)|([ ]+)|([\r\n]+)|(\+)|(\-)|(\*)|(\/)/g
+  const dictionary = ['Number', 'whitespace', 'LineTerminator', '+', '-', '*', '/']
+  
+  function* tokenize(source) {
+    let result = null
+    let lastIndex = 0
+    
+    do {
+      // 匹配
+      lastIndex = regexp.lastIndex
+      result = regexp.exec(source)
+      // 判断
+      if (!result) break
+      if (regexp.lastIndex - lastIndex > result[0].length) {
+        // 有非法字符，报错
+        throw new Error('Unexpected token "' + source.slice(lastIndex, regexp.lastIndex - result[0].length) + '"')
+      }
+      // 生成token
+      let token = {
+        type: null,
+        value: null,
+      }
+      for(let i = 0; i < dictionary.length; i++) {
+        if (result[i + 1]) {
+          token.type = dictionary[i]
+        }
+      }
+      token.value = result[0]
+      yield token
+    } while(result)
+    
+    yield {type: 'EOF'}
+  }
+  
+  // ll 从小到大实现
+  
+  function Expression(source) {
+    // ::= AddtiveExpression EOF
+    if (source[0].type === 'AddtiveExpression' && source[1].type === 'EOF') {
+      let node = {
+        type: 'Expression',
+        children: [source.shift(), source.shift()]
+      }
+      source.unshift(node)
+      return node
+    }
+    AddtiveExpression(source)
+    return Expression(source)
+  }
+  
+  function AddtiveExpression(source) {
+    // ::= MultiplicativeExpression
+    //     AddtiveExpression + MultiplicativeExpression
+    //     AddtiveExpression - MultiplicativeExpression
+    
+    if (source[0].type === 'Number') {
+      MultiplicativeExpression(source)
+      return AddtiveExpression(source)
+    }
+    if (source[0].type === 'MultiplicativeExpression') {
+      let node = {
+        type: 'AddtiveExpression',
+        children: source.shift()
+      }
+      source.unshift(node)
+      return AddtiveExpression(source)
+    }
+    if (source[0].type === 'AddtiveExpression' &&
+      source.length > 1 && source[1].type === '+'
+    ) {
+      let node = {
+        type: 'AddtiveExpression',
+        children: [source.shift(), source.shift()]
+      }
+      // 处理MultiplicativeExpression
+      MultiplicativeExpression(source)
+      node.children.push(source.shift())
+      source.unshift(node)
+      return AddtiveExpression(source)
+    }
+    if (source[0].type === 'AddtiveExpression' &&
+      source.length > 1 && source[1].type === '-'
+    ) {
+      let node = {
+        type: 'AddtiveExpression',
+        children: [source.shift(), source.shift()]
+      }
+      // 处理MultiplicativeExpression
+      MultiplicativeExpression(source)
+      node.children.push(source.shift())
+      source.unshift(node)
+      return AddtiveExpression(source)
+    }
+    if (source[0].type === 'AddtiveExpression') {
+      return source[0]
+    }
+  }
+  
+  function MultiplicativeExpression(source) {
+    // TODO: 要将表达式全部展开，才能判断出所有情况，将每个情况转换成代码即可
+    // ::= Number
+    //     MultiplicativeExpression * Number
+    //     MultiplicativeExpression / Number
+    // console.log(source)
+    if (source[0].type === 'Number') {
+      let node = {
+        type: 'MultiplicativeExpression',
+        children: source.shift()
+      }
+      source.unshift(node)
+      return MultiplicativeExpression(source)
+    }
+    if (source[0].type === 'MultiplicativeExpression' &&
+      source.length > 1 && source[1].type === '*'
+    ) {
+      let node = {
+        type: 'MultiplicativeExpression',
+        children: [source.shift(), source.shift(), source.shift()]
+      }
+      source.unshift(node)
+      return MultiplicativeExpression(source)
+    }
+    if (source[0].type === 'MultiplicativeExpression' &&
+      source.length > 1 && source[1].type === '/'
+    ) {
+      let node = {
+        type: 'MultiplicativeExpression',
+        children: [source.shift(), source.shift(), source.shift()]
+      }
+      source.unshift(node)
+      return MultiplicativeExpression(source)
+    }
+    if (source[0].type === 'MultiplicativeExpression') {
+      return source[0]
+    }
+    throw new Error('')
+  }
+  
+  let source = []
+  for (let token of tokenize('1000 * 2 + 4 * 3 - 5 * 200 * 2')) {
+    if (token.type !== 'whitespace' && token.type !== 'LineTerminator') {
+      source.push(token)
+    }
+  }
+  // const res = MultiplicativeExpression(source)
+  // const res = AddtiveExpression(source)
+  const res = Expression(source)
+  // 可选作业，用状态机实现
+  // generator iterator 是数组的超集
+  // 可选作业2，实现加括号的
+</script>
