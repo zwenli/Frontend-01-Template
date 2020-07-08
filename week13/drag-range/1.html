@@ -1,0 +1,43 @@
+<style>
+  #dragable {
+    display: inline-block;
+    background-color: pink;
+    width: 100px;
+    height: 100px;
+    position: relative;
+  }
+  
+</style>
+
+<div id="dragable"></div>
+
+<script>
+  let dragable = document.getElementById('dragable')
+  
+  // 存放translate的位置
+  let baseX = 0
+  let baseY = 0
+  
+  // mousedown-mousemove-mouseup
+  // 其中必须先在拖拽元素按下才继续监听后续事件，同时鼠标松开后需要将事件情况，防止不断添加事件listener
+  dragable.addEventListener('mousedown', (e) => {
+    const startX = e.clientX
+    const startY = e.clientY
+    let move = (event) => {
+      // console.log(event)
+      let x = baseX + event.clientX - startX
+      let y = baseY + event.clientY - startY
+      dragable.style.transform = `translate(${x}px, ${y}px)`
+    }
+    let up = (event) => {
+      baseX = baseX + event.clientX - startX
+      baseY = baseY + event.clientY - startY
+      console.log(baseX, baseY)
+      document.removeEventListener('mousemove', move)
+      document.removeEventListener('mouseup', up)
+    }
+    // 注意是在document上监听这两个事件
+    document.addEventListener('mousemove', move)
+    document.addEventListener('mouseup', up)
+  })
+</script>

@@ -1,0 +1,11 @@
+<input value="cute" />
+<script>
+  var input = document.getElementsByTagName('input')[0]
+  // 若property 没有设置，则结果是attribute
+  input.value // cute
+  input.getAttribute('value') // cute
+  // 若value属性已经设置，则property变化，attribute不变，元素上实际的效果是 property 优先
+  input.value = 'hello'
+  input.value // hello
+  input.getAttribute('value') // cute
+</script>
