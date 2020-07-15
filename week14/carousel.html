@@ -1,0 +1,169 @@
+<html>
+
+<head>
+  <title>carousel component</title>
+  <style>
+    .carousel {
+      width: 500px;
+      height: 280px;
+      white-space: nowrap;
+      overflow: hidden;
+      /* zoom: 0.5; */
+      margin: auto;
+      outline: solid 1px blue;
+    }
+    
+    .carousel > img {
+      width: 100%;
+      display: inline-block;
+      transition: ease 1s;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="container"></div>
+  <script>
+    class Carousel {
+      constructor() {
+        this.root = null;
+        this.data = null;
+      }
+      render() {
+        this.root = document.createElement("div");
+        this.root.classList.add("carousel");
+
+        for (let d of this.data) {
+          let element = document.createElement("img");
+          element.src = d;
+          // 禁用图片拖拽
+          element.addEventListener('dragstart', event => event.preventDefault())
+          this.root.appendChild(element);
+        }
+        
+        let timer = null;
+        let position = 0;
+        // 每次移动两张
+        let nextPic = () => {
+          let nextPosition = (position + 1) % this.data.length
+          
+          let current = this.root.children[position];
+          let next = this.root.children[nextPosition];
+          // 禁用transition，防止位移到起始位置时产生动画效果
+          current.style.transition = "none";
+          next.style.transition = "none";
+          // 起始位置
+          current.style.transform = `translateX(${- position * 100}%)`;
+          next.style.transform = `translateX(${100 - nextPosition * 100}%)`;
+          
+          setTimeout(() => {
+            // 为了transition的生效需要setTimeout，promise会出现和requestAnimationFrame类似的问题
+            // 确定好起始位置之后，动画可以生效了
+            current.style.transition = "";
+            next.style.transition = "";
+            // 终止位置
+            current.style.transform = `translateX(${-100 - position * 100}%)`;
+            next.style.transform = `translateX(${- nextPosition * 100}%)`;
+            
+            position = nextPosition;
+          }, 16); // 16为一帧的时间
+          
+          // 使用requestAnimationFrame的，需要套两层，才不会出bug
+          // 因为第一个requestAnimationFrame生效的是起始位置时的，（transform是在下一帧，requestAnimationFrame是找下一帧）
+          // 第二个requestAnimationFrame才会生效setTimeout的回掉
+          // requestAnimationFrame(() => {
+          //   requestAnimationFrame(() => {
+          //     current.style.transition = "";
+          //     next.style.transition = "";
+          //     // 终止位置
+          //     current.style.transform = `translateX(${-100 - position * 100}%)`;
+          //     next.style.transform = `translateX(${- nextPosition * 100}%)`;
+          //     position = nextPosition;
+          //   })
+          // })
+          
+          
+          timer = setTimeout(nextPic, 3000);
+          
+        };
+        
+        timer = setTimeout(nextPic, 3000);
+        
+        // 拖拽， 拖拽和轮播动画有冲突
+        this.root.addEventListener('mousedown', (event) => {
+          timer && window.clearTimeout(timer)
+          
+          const startX = event.clientX
+          const startY = event.clientY
+          
+          const containerWidth = this.root.getBoundingClientRect().width;
+          const lastPosition = (position - 1 + this.data.length) % this.data.length;
+          const nextPosition = (position + 1) % this.data.length;
+          const current = this.root.children[position];
+          const last = this.root.children[lastPosition];
+          const next = this.root.children[nextPosition];
+          
+          current.style.transition = 'ease 0s';
+          last.style.transition = 'ease 0s';
+          next.style.transition = 'ease 0s';
+          
+          let move = event => {
+            console.log(event.clientX - startX, event.clientY - startY);
+            current.style.transform = `translateX(${event.clientX - startX - position * containerWidth}px)`;
+            last.style.transform = `translateX(${event.clientX - startX - (lastPosition - 1) * containerWidth}px)`;
+            next.style.transform = `translateX(${event.clientX - startX - (nextPosition + 1) * containerWidth}px)`;
+          }
+          let up = event => {
+            // 根据偏移量，决定是保持不变，还是切换到上一张/下一张
+            let offset = 0;
+            if (event.clientX - startX > containerWidth / 2) {
+              offset = 1;
+            } else if (event.clientX - startX < - containerWidth / 2) {
+              offset = -1;
+            }
+            
+            current.style.transition = '';
+            last.style.transition = '';
+            next.style.transition = '';
+            
+            current.style.transform = `translateX(${offset * containerWidth - position * containerWidth}px)`;
+            last.style.transform = `translateX(${offset * containerWidth - (lastPosition - 1) * containerWidth}px)`;
+            next.style.transform = `translateX(${offset * containerWidth - (nextPosition + 1) * containerWidth}px)`;
+            // 确定当前位置
+            position = (position + offset + this.data.length) % this.data.length;
+            document.removeEventListener('mousemove', move);
+            document.removeEventListener('mouseup', up);
+            
+            timer = setTimeout(nextPic, 3000);
+          }
+          
+          document.addEventListener('mousemove', move);
+          document.addEventListener('mouseup', up);
+          
+        })
+      }
+    }
+
+
+    //create
+    let carousel = new Carousel();
+
+    //update
+    carousel.data = [
+      "https://static001.geekbang.org/resource/image/bb/21/bb38fb7c1073eaee1755f81131f11d21.jpg",
+      "https://static001.geekbang.org/resource/image/1b/21/1b809d9a2bdf3ecc481322d7c9223c21.jpg",
+      "https://static001.geekbang.org/resource/image/b6/4f/b6d65b2f12646a9fd6b8cb2b020d754f.jpg",
+      "https://static001.geekbang.org/resource/image/73/e4/730ea9c393def7975deceb48b3eb6fe4.jpg",
+    ];
+    carousel.render();
+
+    //mount
+    document.getElementById("container").appendChild(carousel.root);
+
+
+
+  </script>
+</body>
+
+
+</html>
