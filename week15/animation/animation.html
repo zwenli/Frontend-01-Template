@@ -1,0 +1,78 @@
+<style>
+  #el {
+    width: 100px;
+    height: 100px;
+    background-color: skyblue;
+  }
+  #el2 {
+    width: 100px;
+    height: 100px;
+    background-color: skyblue;
+    /* transition: transform linear .5s; */
+  }
+</style>
+<div id="el"></div>
+<div id="el2"></div>
+<button id="paust-btn">pause</button>
+<button id="resume-btn">resume</button>
+<button id="restart-btn">restart</button>
+<button id="el2-start-btn">el2-start</button>
+<script type="module">
+  import { Timeline, Animation, ColorAnimation } from './animation.js'
+  import { cubicBezier } from './cubicBezier.js'
+  const el = document.querySelector('#el')
+  const el2 = document.querySelector('#el2')
+  // el.style.transition = 'ease 5s'
+  const tl = new Timeline;
+  
+  const linear = (t) => t;
+  const ease = cubicBezier(.25,.1,.25,1)
+  
+  const animation = new Animation(
+    el.style,
+    'transform',
+    0,
+    200,
+    5000,
+    0,
+    linear,
+    v => `translateX(${v}px)`,
+  )
+  tl.add(animation)
+  tl.start()
+  // setTimeout(() => {
+  //   tl.start()
+  //   document.querySelector('#el2').style.transform = 'translateX(200px)'
+  // }, 1000)
+  
+  document.querySelector('#paust-btn').addEventListener('click', () => {
+    tl.pause()
+  })
+  document.querySelector('#resume-btn').addEventListener('click', () => {
+    tl.resume()
+  })
+  document.querySelector('#el2-start-btn').addEventListener('click', () => {
+    // tl.add(new Animation(
+    //   el2.style,
+    //   'transform',
+    //   0,
+    //   200,
+    //   5000,
+    //   0,
+    //   linear,
+    //   v => `translateX(${v}px)`,
+    // ), 0)
+    tl.add(new ColorAnimation(
+      el.style,
+      'backgroundColor',
+      {r:0, g: 0, b: 0, a: 1},
+      {r:255, g: 0, b: 0, a: 1},
+      5000,
+      0,
+      linear,
+    ), 0)
+  })
+  document.querySelector('#restart-btn').addEventListener('click', () => {
+    tl.restart()
+  })
+</script>
