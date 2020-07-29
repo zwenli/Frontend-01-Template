@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>gusture</title>
+  <style>
+    #my {
+      width: 100px;
+      height: 100px;
+      background-color: aquamarine;
+    }
+  </style>
+</head>
+<body style="width: 100vw; height: 100vh;">
+  <div id="my" style="transform: translate(0px, 0px)"></div>
+  <script src="./gusture.js"></script>
+  <script>
+    document.addEventListener('contextmenu', event => event.preventDefault())
+    document.addEventListener('selectstart', event => event.preventDefault())
+    document.addEventListener('touchmove', event => event.preventDefault(), {passive: false})
+    const my = document.querySelector('#my')
+    enableGusture(my)
+    
+    let x = 0, y = 0;
+    my.addEventListener('pan', (event) => {
+      console.log(x + event.detail.clientX - event.detail.startX, y + event.detail.clientY - event.detail.startY)
+      my.style.transform = `translate(${x + event.detail.clientX - event.detail.startX}px, ${y + event.detail.clientY - event.detail.startY}px)`
+    })
+    my.addEventListener('padend', (event) => {
+      x = x + event.detail.clientX - event.detail.startX
+      y = y + event.detail.clientY - event.detail.startY
+      console.log(x,y)
+      // my.style.transform = `translate(${x}px, ${y}px)`
+    })
+  </script>
+</body>
+</html>

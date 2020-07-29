@@ -6,16 +6,19 @@
   }
 </style>
 <div id="el"></div>
+<button onclick="start();">start</button>
+<button onclick="stop();">stop</button>
 <script>
   const el = document.querySelector('#el')
   el.style.transition = 'ease 5s'
   
   function start() {
+    el.style.transition = 'ease 5s'
     el.style.transform = 'translate(300px, 300px)'
   }
   
   function stop() {
-    el.style.transform = 'none'
     el.style.transform = getComputedStyle(el).transform
+    el.style.transition = 'none'
   }
 </script>
