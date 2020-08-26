@@ -1,0 +1,15 @@
+<template>
+  <div>
+    <img src="xxx" alt="xxx" />
+  </div>
+</template>
+
+<script>
+export default {
+  name: '#example',
+  data: {
+    message: 'carousel',
+  },
+  
+}
+</script>

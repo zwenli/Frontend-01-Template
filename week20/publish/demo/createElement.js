@@ -1,0 +1,103 @@
+import { enableGusture } from './gusture'
+
+export function createElement(cls, attributes, ...children) {
+  let o
+  if (typeof cls === 'string') {
+    o = new Wrapper(cls)
+  } else  {
+    o = new cls({
+      timer: {}
+    })
+  }
+  if (attributes !== null) {
+    Object.entries(attributes).forEach(([key, value]) => {
+      o.setAttribute(key, value)
+    })
+  }
+  
+  let visit = (children) => {
+    for(let child of children) {
+      if (typeof child === 'object' && child instanceof Array) {
+        visit(child)
+        continue
+      }
+      if (typeof child === 'string') {
+        child = new Text(child)
+      }
+      o.appendChild(child)
+    }
+  }
+  visit(children)
+
+  return o
+}
+
+export class Text {
+  constructor(text) {
+    this.children = []
+    this.root = document.createTextNode(text)
+  }
+  mountTo(parent) {
+    parent.appendChild(this.root)
+    for (let child of this.children) {
+      child.mountTo(this.root)
+    }
+  }
+  getAttribute(name) {
+    return 
+  }
+}
+
+export class Wrapper {
+  constructor(type) {
+    this.children = []
+    this.root = document.createElement(type)
+  }
+  // attribute
+  setAttribute(name, value) {
+    // console.log('parent attribute', name, value)
+    this.root.setAttribute(name, value)
+    // 事件 on
+    if (name.match(/^on([\s\S]+)$/)) {
+      const eventName = RegExp.$1.replace(/^[\s\S]/, c => c.toLowerCase())
+      this.root.addEventListener(eventName, value)
+    }
+    // 拖拽
+    if (name === 'enableGusture') {
+      enableGusture(this.root)
+    }
+  }
+  getAttribute(name) {
+    return this.root.getAttribute(name)
+  }
+  get style() {
+    return this.root.style
+  }
+  get classList() {
+    return this.root.classList
+  }
+  set innerText(text) {
+    return this.root.innerText = text
+  }
+  
+  getBoundingClientRect() {
+    return this.root.getBoundingClientRect()
+  }
+  // children
+  appendChild(child) {
+    this.children.push(child)
+  }
+  addEventListener(...args) {
+    this.root.addEventListener(...args)
+  }
+  removeEventListener(...args) {
+    this.root.removeEventListener(...args)
+  }
+  
+  mountTo(parent) {
+    parent.appendChild(this.root)
+    for (let child of this.children) {
+      child.mountTo(this.root)
+    }
+  }
+}
